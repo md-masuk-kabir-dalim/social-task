@@ -1,0 +1,8 @@
+node_modules
+dist
+.vercel
+*.log
+*.logs
+logs/
+logs/*.log
+uploads/*.mp4
