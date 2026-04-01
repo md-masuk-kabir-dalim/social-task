@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 export interface IPost {
   content: string;
+  policy: "PUBLISH" | "PRIVATE";
   image?: {
     url: string;
     altText: string;

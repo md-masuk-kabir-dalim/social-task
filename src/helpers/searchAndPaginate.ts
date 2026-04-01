@@ -1,11 +1,11 @@
-import { Document, Model, Query } from "mongoose";
+import { Model, Query } from "mongoose";
 
 export interface PopulateOption {
   path: string;
   select?: string;
 }
 
-interface SearchPaginateOptions<T extends Document> {
+interface SearchPaginateOptions<T> {
   model: Model<T>;
   searchFields?: (keyof T)[];
   filters?: Record<string, any>;
@@ -19,7 +19,7 @@ interface SearchPaginateOptions<T extends Document> {
   skipCount?: boolean;
 }
 
-export const searchPaginate = async <T extends Document>({
+export const searchPaginate = async <T>({
   model,
   searchFields = [],
   filters = {},
@@ -37,17 +37,19 @@ export const searchPaginate = async <T extends Document>({
   if (search && searchFields.length > 0) {
     filter.$text = { $search: search };
   }
-
-  // 🔹 APPLY FILTERS
   Object.entries(filters).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
 
-    // Range filters
     if (typeof value === "object" && !Array.isArray(value)) {
       const range: any = {};
       if (value.gte !== undefined) range.$gte = value.gte;
       if (value.lte !== undefined) range.$lte = value.lte;
-      if (Object.keys(range).length) filter[key] = range;
+      if (Object.keys(range).length) {
+        filter[key] = range;
+        return;
+      }
+
+      filter[key] = value;
       return;
     }
 
@@ -62,7 +64,7 @@ export const searchPaginate = async <T extends Document>({
 
   const skip = (page - 1) * limit;
 
-  let queryBuilder: Query<any[], T> = model
+  let queryBuilder: Query<any[], any> = model
     .find(filter)
     .lean()
     .sort({ [sortBy]: sortOrder === "asc" ? 1 : -1 })
@@ -73,17 +75,16 @@ export const searchPaginate = async <T extends Document>({
 
   if (populate) {
     (Array.isArray(populate) ? populate : [populate]).forEach(
-      (p) => (queryBuilder = queryBuilder.populate(p))
+      (p) => (queryBuilder = queryBuilder.populate(p)),
     );
   }
 
-  // 🔹 Skip counting for small DB (very fast)
   const dataPromise = queryBuilder.exec();
   const totalPromise = skipCount
-    ? Promise.resolve(dataPromise.then((d) => d.length))
+    ? dataPromise.then((d) => d.length)
     : model.countDocuments(filter);
 
-  const [total, data] = await Promise.all([totalPromise, dataPromise]);
+  const [data, total] = await Promise.all([dataPromise, totalPromise]);
 
   return {
     meta: {

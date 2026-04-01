@@ -7,6 +7,11 @@ const PostSchema = new Schema<IPost>(
     content: { type: String, required: true },
     image: ImageSchema,
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    policy: {
+      type: String,
+      enum: ["PUBLISH", "PRIVATE"],
+      default: "PUBLISH",
+    },
   },
   {
     timestamps: true,
