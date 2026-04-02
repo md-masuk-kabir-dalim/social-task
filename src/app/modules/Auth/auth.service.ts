@@ -30,7 +30,8 @@ const registerUser = async (payload: IUser) => {
   const { otp, expiry } = generateOtp();
 
   const newUser = new UserModel({
-    fullName: payload.fullName,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
     email: payload.email,
     password: hashed,
     role: UserRole.USER,
@@ -53,19 +54,19 @@ const registerUser = async (payload: IUser) => {
     OtpType.EMAIL_VERIFICATION,
     payload.fullName,
     newUser._id.toString(),
-    config.jwt.email_verification_secret,
+    config.jwt.verification_secret,
     config.jwt.otp_expires_in,
     "Verify your email",
   );
 
-  return { message: "OTP sent to email", token: otpToken?.otpToken };
+  return { message: "OTP sent to email", token: otpToken?.otpToken, otpToken };
 };
 
 // ------------------------------
 // VERIFY USER OTP
 // ------------------------------
 const verifyOtp = async (email: string, otp: string, type: OtpType) => {
-  const user = await UserModel.findOne({ email }).populate("otp");
+  const user = await UserModel.findOne({ email });
 
   if (!user) throw new ApiError(404, "User not found");
 
@@ -156,7 +157,7 @@ const loginUser = async (email: string, password: string) => {
       OtpType.EMAIL_VERIFICATION,
       user.fullName,
       user._id.toString(),
-      config.jwt.email_verification_secret,
+      config.jwt.verification_secret,
       config.jwt.otp_expires_in,
       "Verify your email",
     );
@@ -307,7 +308,7 @@ const sendOtpService = async (email: string, type: OtpType) => {
   if (type === "EMAIL_VERIFICATION") {
     if (user.isVerified) throw new ApiError(400, "User is already verified");
 
-    secret = config.jwt.email_verification_secret;
+    secret = config.jwt.verification_secret;
   } else if (type === "PASSWORD_RESET") {
     secret = config.jwt.password_reset_secret;
   } else {
@@ -324,7 +325,7 @@ const sendOtpService = async (email: string, type: OtpType) => {
     type === "EMAIL_VERIFICATION" ? "Verify your email" : "Reset Password",
   );
 
-  return { message: "OTP sent to email", token: otpToken };
+  return { message: "OTP sent to email", data: otpToken };
 };
 
 /* ===========================

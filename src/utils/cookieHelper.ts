@@ -49,3 +49,9 @@ export const clearCookie = (res: Response, name: keyof typeof CookieNames) => {
     ...(isProd && config.cookies.domain && { domain: config.cookies.domain }),
   });
 };
+
+export const getCookieName = (name: keyof typeof CookieNames) => {
+  return isProd
+    ? `__Secure-${CookieNames[name]}`
+    : `__Local-${CookieNames[name]}`;
+};

@@ -17,7 +17,7 @@ const envSchema = z.object({
   REFRESH_TOKEN_SECRET: z.string().min(10),
   OTP_EXPIRES_IN: z.string().default("10m"),
   REFRESH_TOKEN_EXPIRES_IN: z.string().default("7d"),
-  EMAIL_VERIFICATION: z.string().min(10),
+  VERIFICATION_SECRET: z.string().min(10),
   PASSWORD_RESET: z.string().min(10),
   PASSWORD_SALT: z.string(),
   CSRF_SECRET: z.string(),

@@ -1,10 +1,9 @@
-import { CookieOptions, Request, Response } from "express";
+import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { AuthServices } from "./auth.service";
 import ApiError from "../../../errors/ApiErrors";
-import config from "../../../config";
 import { OtpType } from "./otp.model";
 import { clearCookie, setCookie } from "../../../utils/cookieHelper";
 
@@ -157,6 +156,8 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 const otpSend = catchAsync(async (req: Request, res: Response) => {
   const { email, type } = req.body;
   const result = await AuthServices.sendOtpService(email, type);
+
+  setCookie(res, "OTP", result?.data.otpToken, 1000 * 60 * 10); // 10 minutes
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

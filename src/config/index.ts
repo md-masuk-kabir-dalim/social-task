@@ -35,7 +35,7 @@ export default {
     refresh_expires_in: env.REFRESH_TOKEN_EXPIRES_IN,
     otp_expires_in: env.OTP_EXPIRES_IN || "10m",
     CSRF_SECRET: env.CSRF_SECRET,
-    email_verification_secret: env.EMAIL_VERIFICATION!,
+    verification_secret: env.VERIFICATION_SECRET!,
     password_reset_secret: env.PASSWORD_RESET!,
   },
   emailSender: {

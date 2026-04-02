@@ -4,7 +4,7 @@ import { UserModel, UserRole } from "../modules/User/user.model";
 
 export const initiateSuperAdmin = async () => {
   const payload = {
-    fullName: "Super",
+    fullName: "Super Admin",
     email: config.password.admin_email,
     phoneNo: "+1234567890",
     password: config.password.superadmin_password,
@@ -23,6 +23,8 @@ export const initiateSuperAdmin = async () => {
   // Create  Admin user
   const user = await UserModel.create({
     fullName: payload.fullName,
+    firstName: payload.fullName.split(" ")[0],
+    lastName: payload.fullName.split(" ")[1] || "",
     email: payload.email,
     phoneNo: payload.phoneNo,
     password: hashedPassword,

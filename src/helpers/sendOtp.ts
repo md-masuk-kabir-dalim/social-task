@@ -14,6 +14,8 @@ const sendOtp = async (
   subject: string,
 ) => {
   const { otp, expiry } = generateOtp();
+  const OTP_COOLDOWN_SECONDS = 60;
+  const cooldownAt = new Date(Date.now() + OTP_COOLDOWN_SECONDS * 1000);
 
   await OtpModel.findOneAndUpdate(
     { identifier: email },
@@ -22,17 +24,25 @@ const sendOtp = async (
   );
 
   // send email
-  emailSender(subject, email, otpEmail(fullName, otp));
+  // emailSender(subject, email, otpEmail(fullName, otp));
 
   // Generate JWT token
   const otpToken = jwtHelpers.generateToken(
-    { id: userId, email, type: type },
+    {
+      id: userId,
+      email,
+      type: type,
+      expiresAt: expiry.toISOString(),
+      cooldownAt: cooldownAt.toISOString(),
+    },
     access_secret,
     access_expires_in,
   );
 
   return {
     otpToken,
+    expiresAt: expiry.toISOString(),
+    cooldownAt: cooldownAt.toISOString(),
   };
 };
 

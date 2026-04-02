@@ -4,7 +4,8 @@ import { Secret } from "jsonwebtoken";
 import config from "../../config";
 import ApiError from "../../errors/ApiErrors";
 import { UserModel } from "../modules/User/user.model";
-import { clearCookie } from "../../utils/cookieHelper";
+import { clearCookie, getCookieName } from "../../utils/cookieHelper";
+import { jwtHelpers } from "../../utils/jwtHelpers";
 
 const auth = (...roles: string[]) => {
   return async (
@@ -14,7 +15,7 @@ const auth = (...roles: string[]) => {
   ): Promise<void> => {
     try {
       const authHeader = req.headers.authorization;
-
+      const url = req.originalUrl;
       let token: string | undefined;
 
       if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -22,7 +23,14 @@ const auth = (...roles: string[]) => {
       }
 
       if (!token) {
-        token = req.cookies?.accessToken ?? req?.cookies?.otpToken;
+        const accessCookie = getCookieName("ACCESS");
+        const otpCookie = getCookieName("OTP");
+
+        if (url.includes("/otp/verify")) {
+          token = req.cookies?.[otpCookie];
+        } else {
+          token = req.cookies?.[accessCookie];
+        }
       }
 
       if (!token) {
@@ -30,19 +38,22 @@ const auth = (...roles: string[]) => {
       }
 
       let secret: Secret;
-      const url = req.originalUrl;
 
       if (url.includes("/refresh-token")) {
         secret = config.jwt.refresh_secret;
-      } else if (url.includes("/verify-otp")) {
-        secret = config.jwt.email_verification_secret;
+      } else if (url.includes("/otp/verify")) {
+        secret = config.jwt.verification_secret;
       } else if (url.includes("/reset-password")) {
         secret = config.jwt.password_reset_secret;
       } else {
         secret = config.jwt.access_secret;
       }
 
-      let verifiedUser: any;
+      console.log(secret, "oooooooooooooooo");
+
+      let verifiedUser: any = jwtHelpers.verifyToken(token, secret);
+
+      console.log(verifiedUser);
 
       const user = await UserModel.findOne({ email: verifiedUser.email });
 
