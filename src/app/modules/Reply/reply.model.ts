@@ -26,4 +26,10 @@ ReplySchema.virtual("likesCount", {
   count: true,
 });
 
+ReplySchema.virtual("likes", {
+  ref: "Like",
+  localField: "_id",
+  foreignField: "reply",
+});
+
 export const ReplyModel = model<IReply>("Reply", ReplySchema);

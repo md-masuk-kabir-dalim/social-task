@@ -40,7 +40,10 @@ const getCommentForPostId = async (postId: string) => {
     .populate("likes","user type")
     .populate({
       path: "replies",
-      populate: { path: "author", select: "fullName image" },
+      populate: [
+        { path: "author", select: "fullName image" },
+        { path: "likes", select: "user type" },
+      ],
     });
   return comments;
 };
