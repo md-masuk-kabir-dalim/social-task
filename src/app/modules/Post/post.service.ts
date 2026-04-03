@@ -75,6 +75,7 @@ const getPostsForFeed = async (
   const postsWithCounts = await PostModel.populate(data, [
     { path: "likesCount" },
     { path: "commentsCount" },
+     { path: "likes" },
   ]);
 
   return {

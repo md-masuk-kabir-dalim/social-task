@@ -35,6 +35,13 @@ PostSchema.virtual("likesCount", {
   count: true,
 });
 
+
+PostSchema.virtual("likes", {
+  ref: "Like",
+  localField: "_id",
+  foreignField: "post",
+});
+
 // Total comments for post
 PostSchema.virtual("commentsCount", {
   ref: "Comment",
