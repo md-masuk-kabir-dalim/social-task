@@ -77,7 +77,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
  * ======================= */
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const token = req.cookies?.[getCookieName("REFRESH")];
-  console.log(token)
+
   if (!token)
     throw new ApiError(httpStatus.UNAUTHORIZED, "Refresh token missing");
 
