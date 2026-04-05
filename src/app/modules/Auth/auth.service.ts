@@ -52,7 +52,7 @@ const registerUser = async (payload: IUser) => {
   const otpToken = await sendOtp(
     payload.email,
     OtpType.EMAIL_VERIFICATION,
-    payload.fullName,
+    newUser?.fullName,
     newUser._id.toString(),
     config.jwt.verification_secret,
     config.jwt.otp_expires_in,

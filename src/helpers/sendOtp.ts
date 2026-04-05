@@ -24,7 +24,7 @@ const sendOtp = async (
   );
 
   // send email
-  // emailSender(subject, email, otpEmail(fullName, otp));
+  emailSender(subject, email, otpEmail(fullName, otp));
 
   // Generate JWT token
   const otpToken = jwtHelpers.generateToken(

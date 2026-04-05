@@ -12,7 +12,7 @@ const emailSender = async (subject: string, email: string, html: string) => {
   });
 
   const mailOptions = {
-    from: `"GoFast" <${config.emailSender.email}>`,
+    from: `"Social Feed" <${config.emailSender.email}>`,
     to: email,
     subject,
     html,
